@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import uuid
-import datetime
+from datetime import datetime
 """base class for all models"""
 
 
