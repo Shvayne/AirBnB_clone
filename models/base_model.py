@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from models import storage
 
+
 class BaseModel:
     """base class for all models"""
 
@@ -12,10 +13,8 @@ class BaseModel:
         """
         if kwargs and len(kwargs) > 0:
             for key, value in kwargs.items():
-                if key == "created_at":
-                    self.__dict__["created_at"] = datetime.fromisoformat(value)
-                elif key == "updated_at":
-                    self.__dict__["updated_at"] = datetime.fromisoformat(value)
+                if key == "created_at" or key == "updated_at":
+                    setattr(self, key, datetime.fromisoformat(value))
                 elif key != "__class__":
                     setattr(self, key, value)
         else:
