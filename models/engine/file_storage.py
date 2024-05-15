@@ -4,8 +4,10 @@ import json
 import os
 import datetime
 
+
 class FileStorage:
-    """serializes instances to a json file and deserializes JSON file to instances"""
+    """serializes instances to a json file
+    and deserializes JSON file to instances"""
     __file_path = "file.json"
     __objects = {}
 
@@ -33,6 +35,7 @@ class FileStorage:
 
     def reload(self):
         """deserializes Json files"""
-        if os.path.isFile(FileStorage.__file_path) and os.path.getsize(FileStorage.__file_path) > 0:
+        if os.path.isfile(FileStorage.__file_path) and
+        os.path.getsize(FileStorage.__file_path) > 0:
             with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
                 obj_dict = json.load(f)
