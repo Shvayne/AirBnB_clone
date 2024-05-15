@@ -8,12 +8,21 @@ from datetime import datetime
 class BaseModel:
     """base class for all models"""
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """A constructor method initializing BaseModel
         """
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        if kwargs and len(kwargs) > 0:
+            for key, value in kwargs.items():
+                if key == "created_at":
+                    self.__dict__["created_at"] = datetime.fromisoformat(value)
+                elif key == "updated_at":
+                    self.__dict__["updated_at"] = datetime.fromisoformat(value)
+                elif key != "__class__":
+                    setattr(self, key, value)
+        else:
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
     def __str__(self) -> str:
         """returns a string representation of the BaseModel
