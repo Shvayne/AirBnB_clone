@@ -3,6 +3,8 @@
 import json
 import os
 import datetime
+from models.base_model import BaseModel
+from models.user import User
 
 
 class FileStorage:
@@ -28,14 +30,20 @@ class FileStorage:
         """serialize objects to the json file"""
         objects = {}
         for obj_id, obj in FileStorage.__objects.items():
-            obj_dict = obj.to_dict()
-            objects[obj_id] = obj_dict
-        with open(FileStorage.__file_path, "w", encoding='utf-8') as f:
+            objects[obj_id] = obj.to_dict()
+        with open(FileStorage.__file_path, "w") as f:
             json.dump(objects, f)
 
     def reload(self):
         """deserializes Json files"""
         if os.path.isfile(FileStorage.__file_path) and
         os.path.getsize(FileStorage.__file_path) > 0:
-            with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
-                obj_dict = json.load(f)
+            with open(FileStorage.__file_path, "r") as f:
+                objects = json.load(f)
+                for obj_id, obj_dict in objects.items():
+                    class_name, obj_id = obj_id.split(".")
+                    if class_name == "BaseModel":
+                        obj = BaseModel(**obj_dict)
+                    elif class_name == "User":
+                        obj = User(**obj_dict)
+                    FileStorage.__objects[obj_id] = obj
