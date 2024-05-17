@@ -3,6 +3,7 @@ import json
 import shlex
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+from models.user import User
 from models.review import Review
 from models.state import State
 from models.place import Place
@@ -24,12 +25,14 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel", "Review", "State",
+        if class_name not in ("BaseModel", "User", "Review", "State",
                               "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if class_name == "BaseModel":
             new_instance = BaseModel()
+        if class_name == "User":
+            new_instance = User()
         elif class_name == "Review":
             new_instance = Review()
         elif class_name == "State":
@@ -52,7 +55,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel", "Review", "State",
+        if class_name not in ("BaseModel", "User", "Review", "State",
                               "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
@@ -76,7 +79,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel", "Review", "State",
+        if class_name not in ("BaseModel", "User", "Review", "State",
                               "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
@@ -97,7 +100,7 @@ class HBNBCommand(cmd.Cmd):
            all instances based or not on the class name.
         """
         args = shlex.split(arg)
-        if args and args[0] not in ("BaseModel", "Review", "State",
+        if args and args[0] not in ("BaseModel", "User", "Review", "State",
                                     "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
@@ -117,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel", "Review", "State",
+        if class_name not in ("BaseModel", "User", "Review", "State",
                               "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
