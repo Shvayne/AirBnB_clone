@@ -3,6 +3,11 @@ import json
 import shlex
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+from models.review import Review
+from models.state import State
+from models.place import Place
+from models.city import City
+from models.amenity import Amenity
 
 
 class HBNBCommand(cmd.Cmd):
@@ -11,6 +16,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Create a new instance of BaseModel,
+            and all new classes
             save it (to the JSON file) and print the id.
         """
         args = shlex.split(arg)
@@ -18,10 +24,22 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel",):
+        if class_name not in ("BaseModel", "Review", "State",
+                              "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
-        new_instance = BaseModel()
+        if class_name == "BaseModel":
+            new_instance = BaseModel()
+        elif class_name == "Review":
+            new_instance = Review()
+        elif class_name == "State":
+            new_instance = State()
+        elif class_name == "Place":
+            new_instance = Place()
+        elif class_name == "City":
+            new_instance = City()
+        elif class_name == "Amenity":
+            new_instance = Amenity()
         new_instance.save()
         print(new_instance.id)
 
@@ -34,7 +52,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel",):
+        if class_name not in ("BaseModel", "Review", "State",
+                              "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if len(args) < 2:
@@ -57,7 +76,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel",):
+        if class_name not in ("BaseModel", "Review", "State",
+                              "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if len(args) < 2:
@@ -77,7 +97,8 @@ class HBNBCommand(cmd.Cmd):
            all instances based or not on the class name.
         """
         args = shlex.split(arg)
-        if args and args[0] not in ("BaseModel",):
+        if args and args[0] not in ("BaseModel", "Review", "State",
+                                    "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         all_objs = FileStorage().all()
@@ -96,7 +117,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         class_name = args[0]
-        if class_name not in ("BaseModel",):
+        if class_name not in ("BaseModel", "Review", "State",
+                              "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if len(args) < 2:
