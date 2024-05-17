@@ -2,7 +2,6 @@
 """this module contains a class file_storage"""
 import json
 import os
-import datetime
 from models.base_model import BaseModel
 from models.user import User
 
@@ -36,8 +35,8 @@ class FileStorage:
 
     def reload(self):
         """deserializes Json files"""
-        if os.path.isfile(FileStorage.__file_path) and
-        os.path.getsize(FileStorage.__file_path) > 0:
+        if (os.path.isfile(FileStorage.__file_path) and
+           os.path.getsize(FileStorage.__file_path) > 0):
             with open(FileStorage.__file_path, "r") as f:
                 objects = json.load(f)
                 for obj_id, obj_dict in objects.items():
