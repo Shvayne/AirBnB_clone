@@ -40,9 +40,9 @@ class TestBaseModel(unittest.TestCase):
     def test_save(self, mock_datetime):
         """Test the save method of the Basemodel"""
         base_model = BaseModel()
-        mock_datetime.now.return_value = datetime(2024, 5, 15)
+        mock_datetime.now.return_value = datetime(2024, 5, 18)
         base_model.save()
-        self.assertEqual(base_model.updated_at, datetime(2024, 5, 15))
+        self.assertEqual(base_model.updated_at, datetime(2024, 5, 18))
 
     def test_to_dict(self):
         """test the to_dict method of Basemodel"""
