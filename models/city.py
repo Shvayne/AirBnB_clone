@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-"""
-Class that defines a state
-"""
+"""This module contains the City class"""
 from models.base_model import BaseModel
 
 
-class State(BaseModel):
-    """class to create a state"""
+class City(BaseModel):
+    """A city class"""
+    state_id = ""
     name = ""
