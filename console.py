@@ -13,14 +13,15 @@ from models.amenity import Amenity
 
 class HBNBCommand(cmd.Cmd):
     """Command interpreter class"""
+
     prompt = "(hbnb) "
 
     def do_quit(self, arg):
-        """Quit command to exit the program"""
+        """Quit the command interpreter"""
         return True
 
     def do_EOF(self, arg):
-        """EOF command to exit the program"""
+        """EOF command to exit the command interpreter (Ctrl+D)"""
         return True
 
     def emptyline(self):
