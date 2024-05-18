@@ -33,10 +33,10 @@ class TestBaseModel(unittest.TestCase):
     def test_str(self):
         """Test the __str__ method of the basemodel"""
         base_model = BaseModel()
-        expected_output = f"[BaseModel]({base_model.id}){base_model.__dict__}"
+        expected_output = f"[BaseModel] ({base_model.id}) {base_model.__dict__}"
         self.assertEqual(str(base_model), expected_output)
 
-    @patch('models.base_model.datetime')
+    @patch('models.base_model.datetime', wraps=datetime)
     def test_save(self, mock_datetime):
         """Test the save method of the Basemodel"""
         base_model = BaseModel()

@@ -8,6 +8,7 @@ from models import storage
 from models.base_model import BaseModel
 import os
 
+
 class TestHBNBCommand(unittest.TestCase):
     """tests for the console"""
     def setUp(self):
@@ -168,6 +169,6 @@ class TestHBNBCommand(unittest.TestCase):
             HBNBCommand().onecmd(f"update BaseModel {obj.id} name")
             self.assertEqual(out.getvalue().strip(), "** value missing **")
 
+
 if __name__ == "__main__":
-    unittest.main()
-~                                                                                   
+    unittest.main()                                                                                   
