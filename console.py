@@ -15,6 +15,18 @@ class HBNBCommand(cmd.Cmd):
     """Command interpreter class"""
     prompt = "(hbnb) "
 
+    def do_quit(self, arg):
+        """Quit command to exit the program"""
+        return True
+
+    def do_EOF(self, arg):
+        """EOF command to exit the program"""
+        return True
+
+    def emptyline(self):
+        """Do nothing on empty line"""
+        pass
+
     def do_create(self, arg):
         """Create a new instance of BaseModel,
             and all new classes
@@ -148,6 +160,26 @@ class HBNBCommand(cmd.Cmd):
             FileStorage().save()
         else:
             print("** attribute doesn't exist **")
+
+    def default(self, line):
+        """Handle commands with <class name>.action() format
+           Supports <class name>.all() and <class name>.count().
+        """
+        args = line.split(".")
+        if len(args) == 2:
+            class_name, action = args[0], args[1]
+            if class_name in globals():
+                cls = eval(class_name)
+                if action == "all()":
+                    self.do_all(class_name)
+                elif action == "count()":
+                    print(storage.count(cls))
+                else:
+                    print(f"*** Unknown syntax: {line}")
+            else:
+                print(f"*** Unknown syntax: {line}")
+        else:
+            print(f"*** Unknown syntax: {line}")
 
 
 if __name__ == '__main__':
