@@ -1,3 +1,6 @@
+"""This is a command interpreter"""
+
+
 import cmd
 import json
 import shlex
