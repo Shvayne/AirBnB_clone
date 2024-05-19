@@ -169,9 +169,5 @@ class HBNBCommand(cmd.Cmd):
             print(f"*** Unknown syntax: {line}")
 
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        command = ' '.join(sys.argv[1:])
-        HBNBCommand().onecmd(command)
-    else:
-        HBNBCommand().cmdloop()
+if __name__ == '__main__':
+    HBNBCommand().cmdloop()
