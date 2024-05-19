@@ -1,5 +1,5 @@
-"""This is a command interpreter"""
-
+#!/usr/bin/python3
+"""This is an entry point for a command interpreter"""
 
 import cmd
 import json
