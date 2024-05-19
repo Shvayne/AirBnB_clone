@@ -46,19 +46,6 @@ class FileStorage:
             with open(FileStorage.__file_path, "r") as f:
                 objects = json.load(f)
                 for obj_id, obj_dict in objects.items():
-                    class_name, obj_id = obj_id.split(".")
-                    if class_name == "BaseModel":
-                        obj = BaseModel(**obj_dict)
-                    elif class_name == "User":
-                        obj = User(**obj_dict)
-                    elif class_name == "Review":
-                        obj = Review(**obj_dict)
-                    elif class_name == "State":
-                        obj = State(**obj_dict)
-                    elif class_name == "Place":
-                        obj = Place(**obj_dict)
-                    elif class_name == "City":
-                        obj = City(**obj_dict)
-                    elif class_name == "Amenity":
-                        obj = Amenity(**obj_dict)
+                    class_name = obj_id["__class__"]
+                    obj = eval(class_name)(**obj_dict)
                     FileStorage.__objects[obj_id] = obj

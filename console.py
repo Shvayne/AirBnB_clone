@@ -17,11 +17,11 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
 
     def do_quit(self, arg):
-        """Quit the command interpreter"""
+        """Quit command to exit the program"""
         return True
 
     def do_EOF(self, arg):
-        """EOF command to exit the command interpreter (Ctrl+D)"""
+        """EOF command to exit the program (Ctrl+D)"""
         return True
 
     def emptyline(self):
@@ -33,31 +33,18 @@ class HBNBCommand(cmd.Cmd):
             and all new classes
             save it (to the JSON file) and print the id.
         """
-        args = shlex.split(arg)
-        if not args:
+        if not arg:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in ("BaseModel", "User", "Review", "State",
-                              "Place", "City", "Amenity"):
+        try:
+            cls = eval(arg)
+            if not isinstance(cls, type):
+                raise NameError()
+            obj = cls()
+            obj.save()
+            print(obj.id)
+        except NameError:
             print("** class doesn't exist **")
-            return
-        if class_name == "BaseModel":
-            new_instance = BaseModel()
-        if class_name == "User":
-            new_instance = User()
-        elif class_name == "Review":
-            new_instance = Review()
-        elif class_name == "State":
-            new_instance = State()
-        elif class_name == "Place":
-            new_instance = Place()
-        elif class_name == "City":
-            new_instance = City()
-        elif class_name == "Amenity":
-            new_instance = Amenity()
-        new_instance.save()
-        print(new_instance.id)
 
     def do_show(self, arg):
         """Prints the string representation of
@@ -67,16 +54,14 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in ("BaseModel", "User", "Review", "State",
-                              "Place", "City", "Amenity"):
+        if args[0] not in ("BaseModel", "User", "Review", "State",
+                           "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if len(args) < 2:
             print("** instance id missing **")
             return
-        obj_id = args[1]
-        key = "{}.{}".format(class_name, obj_id)
+        key = f"{args[0]}.{args[1]}"
         all_objs = FileStorage().all()
         if key not in all_objs:
             print("** no instance found **")
@@ -91,16 +76,14 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in ("BaseModel", "User", "Review", "State",
-                              "Place", "City", "Amenity"):
+        if args[0] not in ("BaseModel", "User", "Review", "State",
+                           "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
         if len(args) < 2:
             print("** instance id missing **")
             return
-        obj_id = args[1]
-        key = "{}.{}".format(class_name, obj_id)
+        key = f"{args[0]}.{args[1]}"
         all_objs = FileStorage().all()
         if key not in all_objs:
             print("** no instance found **")
@@ -169,7 +152,7 @@ class HBNBCommand(cmd.Cmd):
         args = line.split(".")
         if len(args) == 2:
             class_name, action = args[0], args[1]
-            if class_name in globals():
+            if class_name in classes:
                 cls = eval(class_name)
                 if action == "all()":
                     self.do_all(class_name)
@@ -183,5 +166,9 @@ class HBNBCommand(cmd.Cmd):
             print(f"*** Unknown syntax: {line}")
 
 
-if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        command = ' '.join(sys.argv[1:])
+        HBNBCommand().onecmd(command)
+    else:
+        HBNBCommand().cmdloop()
