@@ -76,23 +76,25 @@ class HBNBCommand(cmd.Cmd):
            on the class name and id.
         """
         args = shlex.split(arg)
-        if not args:
+        if not arg:
             print("** class name missing **")
             return
         if args[0] not in ("BaseModel", "User", "Review", "State",
                            "Place", "City", "Amenity"):
             print("** class doesn't exist **")
-            return
-        if len(args) < 2:
+        elif len(args) == 1:
             print("** instance id missing **")
-            return
-        key = f"{args[0]}.{args[1]}"
-        all_objs = FileStorage().all()
-        if key not in all_objs:
+        else:
+            all_objs = storage.all()
+            for key, value in all_objs.items():
+                obj_name = value.__class__.__name__
+                obj_id = value.id
+                if obj_name == args[0] and obj_id == args[1].strip('"'):
+                    del value
+                    del storage._FileStorage__objects[key]
+                    storage.save()
+                    return
             print("** no instance found **")
-            return
-        del all_objs[key]
-        FileStorage().save()
 
     def do_all(self, arg):
         """Prints all string representation of
@@ -103,70 +105,48 @@ class HBNBCommand(cmd.Cmd):
                                     "Place", "City", "Amenity"):
             print("** class doesn't exist **")
             return
-        all_objs = FileStorage().all()
-        if args:
-            objs = [str(obj) for key, obj in all_objs.items()
-                    if key.startswith(args[0])]
         else:
-            objs = [str(obj) for obj in all_objs.values()]
-        print(objs)
+            all_objs = storage.all()
+            list_instances = []
+            for key, value in all_objs.items():
+                obj_name = value.__class__.__name__
+                if obj_name == args[0]:
+                    list_instances += [value.__str__()]
+            print(list_instances)
 
     def do_update(self, arg):
         """Updates an instance based on
         the class name and id by adding or updating attribute."""
-        args = shlex.split(arg)
-        if not args:
+        if not arg:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in ("BaseModel", "User", "Review", "State",
-                              "Place", "City", "Amenity"):
-            print("** class doesn't exist **")
-            return
-        if len(args) < 2:
-            print("** instance id missing **")
-            return
-        obj_id = args[1]
-        key = "{}.{}".format(class_name, obj_id)
-        all_objs = FileStorage().all()
-        if key not in all_objs:
-            print("** no instance found **")
-            return
-        if len(args) < 3:
-            print("** attribute name missing **")
-            return
-        if len(args) < 4:
-            print("** value missing **")
-            return
-        attr_name = args[2]
-        attr_value_str = args[3]
-        if hasattr(all_objs[key], attr_name):
-            attr_value = type(getattr(all_objs[key], attr_name))
-            (attr_value_str)
-            setattr(all_objs[key], attr_name, attr_value)
-            FileStorage().save()
-        else:
-            print("** attribute doesn't exist **")
 
-    def default(self, line):
-        """Handle commands with <class name>.action() format
-           Supports <class name>.all() and <class name>.count().
-        """
-        args = line.split(".")
-        if len(args) == 2:
-            class_name, action = args[0], args[1]
-            if class_name in classes:
-                cls = eval(class_name)
-                if action == "all()":
-                    self.do_all(class_name)
-                elif action == "count()":
-                    print(storage.count(cls))
-                else:
-                    print(f"*** Unknown syntax: {line}")
-            else:
-                print(f"*** Unknown syntax: {line}")
+        arg = ""
+        for argv in arg.split(','):
+            arg = arg + argv
+
+        args = shlex.split(arg)
+
+        if args[0] not in ("BaseModel", "User", "Review", "State",
+                           "Place", "City", "Amenity"):
+            print("** class doesn't exist **")
+        elif len(args) == 1:
+            print("** instance id missing **")
         else:
-            print(f"*** Unknown syntax: {line}")
+            all_objs = storage.all()
+            for key, objc in all_objs.items():
+                ob_name = objc.__class__.__name__
+                ob_id = objc.id
+                if ob_name == args[0] and ob_id == args[1].strip('"'):
+                    if len(args) == 2:
+                        print("** attribute name missing **")
+                    elif len(args) == 3:
+                        print("** value missing **")
+                    else:
+                        setattr(objc, args[2], args[3])
+                        storage.save()
+                    return
+            print("** no instance found **")
 
 
 if __name__ == '__main__':
