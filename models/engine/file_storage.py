@@ -2,6 +2,7 @@
 """this module contains a class file_storage"""
 import json
 import os
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
 from models.review import Review
