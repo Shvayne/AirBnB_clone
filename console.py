@@ -57,8 +57,7 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        if args[0] not in ("BaseModel", "User", "Review", "State",
-                           "Place", "City", "Amenity"):
+        if args[0] not in classes:
             print("** class doesn't exist **")
             return
         if len(args) < 2:
@@ -79,8 +78,7 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             print("** class name missing **")
             return
-        if args[0] not in ("BaseModel", "User", "Review", "State",
-                           "Place", "City", "Amenity"):
+        if args[0] not in classes:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
@@ -101,8 +99,7 @@ class HBNBCommand(cmd.Cmd):
            all instances based or not on the class name.
         """
         args = shlex.split(arg)
-        if args and args[0] not in ("BaseModel", "User", "Review", "State",
-                                    "Place", "City", "Amenity"):
+        if args and args[0] not in classes:
             print("** class doesn't exist **")
             return
         else:
@@ -127,8 +124,7 @@ class HBNBCommand(cmd.Cmd):
 
         args = shlex.split(arg)
 
-        if args[0] not in ("BaseModel", "User", "Review", "State",
-                           "Place", "City", "Amenity"):
+        if args[0] not in classes:
             print("** class doesn't exist **")
         elif len(args) == 1:
             print("** instance id missing **")
