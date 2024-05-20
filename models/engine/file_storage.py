@@ -2,7 +2,6 @@
 """this module contains a class file_storage"""
 import json
 import os
-from models import storage
 from models.base_model import BaseModel
 from models.user import User
 from models.review import Review
@@ -18,8 +17,13 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self):
-        """returns __objects"""
+    def all(self, cls=None):
+        """Returns a dictionary of models currently in storage
+        If a class is specified, only returns objects of that class.
+        """
+        if cls:
+            return {key: obj for key, obj in FileStorage.__objects.items()
+                    if isinstance(obj, cls)}
         return FileStorage.__objects
 
     def new(self, obj):
@@ -42,11 +46,28 @@ class FileStorage:
 
     def reload(self):
         """deserializes Json files"""
-        if (os.path.isfile(FileStorage.__file_path) and
-           os.path.getsize(FileStorage.__file_path) > 0):
+        if os.path.isfile(FileStorage.__file_path):
+            return
             with open(FileStorage.__file_path, "r") as f:
                 objects = json.load(f)
                 for obj_id, obj_dict in objects.items():
-                    class_name = obj_id["__class__"]
-                    obj = eval(class_name)(**obj_dict)
+                    class_name = obj_dict["__class__"]
+                    cls = eval(class_name)
+                    obj = cls(**obj_dict)
                     FileStorage.__objects[obj_id] = obj
+
+    def count(self, cls=None):
+        """
+        Count the number of instances of a given class,
+        or all instances if no class is specified.
+        Args:
+            cls (type, optional): The class type to count instances of.
+        Returns:
+            int: The number of instances.
+        """
+        if cls:
+            return sum(
+                1 for obj in self.__objects.values()
+                if isinstance(obj, cls)
+            )
+        return len(self.__objects)

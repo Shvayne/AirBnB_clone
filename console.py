@@ -76,10 +76,10 @@ class HBNBCommand(cmd.Cmd):
             return
         key = f"{args[0]}.{args[1]}"
         all_objs = storage.all().get(key)
-        if key not in all_objs:
+        if all_objs:
+            print(all_objs)
+        else:
             print("** no instance found **")
-            return
-        print(all_objs)
 
     def do_destroy(self, arg):
         """Deletes an instance based
@@ -87,6 +87,38 @@ class HBNBCommand(cmd.Cmd):
         """
         args = shlex.split(arg)
         if not arg:
+            print("** class name missing **")
+            return
+        if args[0] not in classes:
+            print("** class doesn't exist **")
+            return
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+        key = f"{args[0]}.{args[1]}"
+        if key in storage.all():
+            del storage.all()[key]
+            storage.save()
+        else:
+            print("** no instance found **")
+
+    def do_all(self, arg):
+        """Prints all string representation of
+           all instances based or not on the class name.
+        """
+        args = shlex.split(arg)
+        if args and args[0] not in classes:
+            print("** class doesn't exist **")
+            return
+        cls = eval(arg) if arg else None
+        objects = storage.all(cls)
+        print([str(obj) for obj in objects.values()])
+
+    def do_update(self, arg):
+        """Updates an instance based on
+        the class name and id by adding or updating attribute."""
+        args = shlex.split(arg)
+        if not args:
             print("** class name missing **")
             return
         if args[0] not in classes:
@@ -109,88 +141,25 @@ class HBNBCommand(cmd.Cmd):
         setattr(obj, args[2], args[3])
         obj.save()
 
-    def do_all(self, arg):
-        """Prints all string representation of
-           all instances based or not on the class name.
-        """
-        args = shlex.split(arg)
-        if args and args[0] not in classes:
-            print("** class doesn't exist **")
-            return
-        cls = classes.get(arg, None)
-        objects = storage.all()
-        if cls:
-            objects = {k: v for k, v in objects.items() if k.startswith(arg)}
-        print([str(obj) for obj in objects.values()])
-
-    def do_update(self, arg):
-        """Updates an instance based on
-        the class name and id by adding or updating attribute."""
-        if not arg:
-            print("** class name missing **")
-            return
-
-        arg = ""
-        for argv in arg.split(','):
-            arg = arg + argv
-
-        args = shlex.split(arg)
-
-        if args[0] not in classes:
-            print("** class doesn't exist **")
-        elif len(args) == 1:
-            print("** instance id missing **")
-        else:
-            all_objs = storage.all()
-            for key, objc in all_objs.items():
-                ob_name = objc.__class__.__name__
-                ob_id = objc.id
-                if ob_name == args[0] and ob_id == args[1].strip('"'):
-                    if len(args) == 2:
-                        print("** attribute name missing **")
-                    elif len(args) == 3:
-                        print("** value missing **")
-                    else:
-                        setattr(objc, args[2], args[3])
-                        storage.save()
-                    return
-            print("** no instance found **")
-
-    def do_count(self, cls=None):
-        """
-        Count the number of instances of a given class,
-        or all instances if no class is specified.
-        Args:
-            cls (type, optional): The class type to count instances of.
-        Returns:
-            int: The number of instances.
-        """
-        if cls:
-            return sum(
-                1 for obj in self.__objects.values()
-                if isinstance(obj, cls)
-            )
-        return len(self.__objects)
-
     def default(self, line):
         """Handle commands with <class name>.action() format"""
         args = line.split(".")
         if len(args) == 2:
             class_name, action = args[0], args[1]
-            if class_name in classes:
-                cls = classes[class_name]
+            if class_name in globals():
+                cls = eval(class_name)
                 if action == "all()":
                     self.do_all(class_name)
                 elif action == "count()":
-                    print(sum(
-                            1 for key in storage.all().keys()
-                            if key.startswith(class_name)))
-                elif action.startswith("show(") and action.endswith(")"):
-                    obj_id = action[5:-1]
-                    self.do_show(f"{class_name} {obj_id}")
-                elif action.startswith("destroy(") and action.endswith(")"):
-                    obj_id = action[8:-1]
-                    self.do_destroy(f"{class_name} {obj_id}")
+                    print(storage.count(cls))
+                elif action.startswith("show"):
+                    instance_id = action[action.find("(")+1:action.find(")")]
+                    self.do_show("(" + class_name
+                                 + instance_id.replace('\"', '') + ")")
+                elif action.startswith("destroy"):
+                    instance_id = action[action.find("(")+1:action.find(")")]
+                    self.do_destroy("(" + class_name
+                                    + instance_id.replace('\"', '') + ")")
                 else:
                     print(f"*** Unknown syntax: {line}")
             else:
