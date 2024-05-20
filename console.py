@@ -5,13 +5,24 @@ import cmd
 import json
 import shlex
 from models.base_model import BaseModel
-from models.engine.file_storage import FileStorage
+from models import storage
 from models.user import User
 from models.review import Review
 from models.state import State
 from models.place import Place
 from models.city import City
 from models.amenity import Amenity
+
+# Dictionary of available classes
+classes = {
+    "BaseModel": BaseModel,
+    "User": User,
+    "City": City,
+    "Place": Place,
+    "State": State,
+    "Amenity": Amenity,
+    "Review": Review
+}
 
 
 class HBNBCommand(cmd.Cmd):
@@ -64,11 +75,11 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
             return
         key = f"{args[0]}.{args[1]}"
-        all_objs = FileStorage().all()
+        all_objs = storage.all().get(key)
         if key not in all_objs:
             print("** no instance found **")
             return
-        print(all_objs[key])
+        print(all_objs)
 
     def do_destroy(self, arg):
         """Deletes an instance based
@@ -80,19 +91,23 @@ class HBNBCommand(cmd.Cmd):
             return
         if args[0] not in classes:
             print("** class doesn't exist **")
-        elif len(args) == 1:
+            return
+        if len(args) < 2:
             print("** instance id missing **")
-        else:
-            all_objs = storage.all()
-            for key, value in all_objs.items():
-                obj_name = value.__class__.__name__
-                obj_id = value.id
-                if obj_name == args[0] and obj_id == args[1].strip('"'):
-                    del value
-                    del storage._FileStorage__objects[key]
-                    storage.save()
-                    return
+            return
+        if len(args) < 3:
+            print("** attribute name missing **")
+            return
+        if len(args) < 4:
+            print("** value missing **")
+            return
+        key = f"{args[0]}.{args[1]}"
+        obj = storage.all().get(key)
+        if not obj:
             print("** no instance found **")
+            return
+        setattr(obj, args[2], args[3])
+        obj.save()
 
     def do_all(self, arg):
         """Prints all string representation of
@@ -102,14 +117,11 @@ class HBNBCommand(cmd.Cmd):
         if args and args[0] not in classes:
             print("** class doesn't exist **")
             return
-        else:
-            all_objs = storage.all()
-            list_instances = []
-            for key, value in all_objs.items():
-                obj_name = value.__class__.__name__
-                if obj_name == args[0]:
-                    list_instances += [value.__str__()]
-            print(list_instances)
+        cls = classes.get(arg, None)
+        objects = storage.all()
+        if cls:
+            objects = {k: v for k, v in objects.items() if k.startswith(arg)}
+        print([str(obj) for obj in objects.values()])
 
     def do_update(self, arg):
         """Updates an instance based on
@@ -143,6 +155,48 @@ class HBNBCommand(cmd.Cmd):
                         storage.save()
                     return
             print("** no instance found **")
+
+    def do_count(self, cls=None):
+        """
+        Count the number of instances of a given class,
+        or all instances if no class is specified.
+        Args:
+            cls (type, optional): The class type to count instances of.
+        Returns:
+            int: The number of instances.
+        """
+        if cls:
+            return sum(
+                1 for obj in self.__objects.values()
+                if isinstance(obj, cls)
+            )
+        return len(self.__objects)
+
+    def default(self, line):
+        """Handle commands with <class name>.action() format"""
+        args = line.split(".")
+        if len(args) == 2:
+            class_name, action = args[0], args[1]
+            if class_name in classes:
+                cls = classes[class_name]
+                if action == "all()":
+                    self.do_all(class_name)
+                elif action == "count()":
+                    print(sum(
+                            1 for key in storage.all().keys()
+                            if key.startswith(class_name)))
+                elif action.startswith("show(") and action.endswith(")"):
+                    obj_id = action[5:-1]
+                    self.do_show(f"{class_name} {obj_id}")
+                elif action.startswith("destroy(") and action.endswith(")"):
+                    obj_id = action[8:-1]
+                    self.do_destroy(f"{class_name} {obj_id}")
+                else:
+                    print(f"*** Unknown syntax: {line}")
+            else:
+                print(f"*** Unknown syntax: {line}")
+        else:
+            print(f"*** Unknown syntax: {line}")
 
 
 if __name__ == '__main__':
