@@ -64,7 +64,7 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
             return
         key = f"{args[0]}.{args[1]}"
-        all_objs = storage.all()
+        all_objs = FileStorage().all()
         if key not in all_objs:
             print("** no instance found **")
             return
